@@ -1,4 +1,4 @@
-# duartebranco's dwm
+# duarte’s dwm build
 
 This is my personal build of dwm with several patches and customizations applied, was forked from Luke Smith's build.
 
