@@ -64,10 +64,8 @@
 #define MOD(N,M)                ((N)%(M) < 0 ? (N)%(M) + (M) : (N)%(M))
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
-#define NUMTAGS			(LENGTH(tags) + LENGTH(scratchpads))
+#define NUMTAGS			(LENGTH(tags))
 #define TAGMASK			((1 << NUMTAGS) - 1)
-#define SPTAG(i)		((1 << LENGTH(tags)) << (i))
-#define SPTAGMASK		(((1 << LENGTH(scratchpads))-1) << LENGTH(tags))
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
 #define TRUNC(X,A,B)            (MAX((A), MIN((X), (B))))
 
@@ -257,7 +255,6 @@ static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
-static void togglescratch(const Arg *arg);
 static void togglesticky(const Arg *arg);
 static void togglefullscr(const Arg *arg);
 static void toggletag(const Arg *arg);
@@ -366,7 +363,7 @@ applyrules(Client *c)
 			c->isfloating = r->isfloating;
 			c->noswallow  = r->noswallow;
 			c->tags |= r->tags;
-			if ((r->tags & SPTAGMASK) && r->isfloating) {
+			if (r->isfloating) {
 				c->x = c->mon->wx + (c->mon->ww / 2 - WIDTH(c) / 2);
 				c->y = c->mon->wy + (c->mon->wh / 2 - HEIGHT(c) / 2);
 			}
@@ -380,7 +377,7 @@ applyrules(Client *c)
 		XFree(ch.res_class);
 	if (ch.res_name)
 		XFree(ch.res_name);
-	c->tags = c->tags & TAGMASK ? c->tags & TAGMASK : (c->mon->tagset[c->mon->seltags] & ~SPTAGMASK);
+	c->tags = c->tags & TAGMASK ? c->tags & TAGMASK : c->mon->tagset[c->mon->seltags];
 }
 
 int
@@ -548,7 +545,7 @@ unswallow(Client *c)
 void
 buttonpress(XEvent *e)
 {
-	unsigned int i, x, click, occ = 0;
+	unsigned int i, x, click;
 	Arg arg = {0};
 	Client *c;
 	Monitor *m;
@@ -563,39 +560,34 @@ buttonpress(XEvent *e)
 	}
 	if (ev->window == selmon->barwin) {
 		i = x = 0;
-		for (c = m->clients; c; c = c->next)
-			occ |= c->tags == 255 ? 0 : c->tags;
-		do {
-			/* do not reserve space for vacant tags */
-			if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
-				continue;
+		do
 			x += TEXTW(tags[i]);
-		} while (ev->x >= x && ++i < LENGTH(tags));
+		while (ev->x >= x && ++i < LENGTH(tags));
 		if (i < LENGTH(tags)) {
 			click = ClkTagBar;
 			arg.ui = 1 << i;
 		} else if (ev->x < x + TEXTW(selmon->ltsymbol))
 			click = ClkLtSymbol;
 		else if (ev->x > (x = selmon->ww - (int)TEXTW(stext) + lrpad)) {
-			click = ClkStatusText;
+            click = ClkStatusText;
 
-			char *text = rawstext;
-			int i = -1;
-			char ch;
-			dwmblockssig = 0;
-			while (text[++i]) {
-				if ((unsigned char)text[i] < ' ') {
-					ch = text[i];
-					text[i] = '\0';
-					x += TEXTW(text) - lrpad;
-					text[i] = ch;
-					text += i+1;
-					i = -1;
-					if (x >= ev->x) break;
-					dwmblockssig = ch;
-				}
-			}
-		} else
+            char *text = rawstext;
+            int i = -1;
+            char ch;
+            dwmblockssig = 0;
+            while (text[++i]) {
+                if ((unsigned char)text[i] < ' ') {
+                    ch = text[i];
+                    text[i] = '\0';
+                    x += TEXTW(text) - lrpad;
+                    text[i] = ch;
+                    text += i+1;
+                    i = -1;
+                    if (x >= ev->x) break;
+                    dwmblockssig = ch;
+                }
+            }
+        } else
 			click = ClkWinTitle;
 	} else if ((c = wintoclient(ev->window))) {
 		focus(c);
@@ -876,7 +868,7 @@ drawbar(Monitor *m)
 	unsigned int i, occ = 0, urg = 0;
 	Client *c;
 
-	if(!m->showbar)
+	if (!m->showbar)
 		return;
 
 	/* draw status first so it can be overdrawn by tags later */
@@ -887,19 +879,19 @@ drawbar(Monitor *m)
 	}
 
 	for (c = m->clients; c; c = c->next) {
-		occ |= c->tags == 255 ? 0 : c->tags;
+		occ |= c->tags;
 		if (c->isurgent)
 			urg |= c->tags;
 	}
 	x = 0;
 	for (i = 0; i < LENGTH(tags); i++) {
-		/* do not draw vacant tags */
-		if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
-		continue;
-
 		w = TEXTW(tags[i]);
 		drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
 		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
+		if (occ & 1 << i)
+			drw_rect(drw, x + boxs, boxs, boxw, boxw,
+				m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
+				urg & 1 << i);
 		x += w;
 	}
 	w = TEXTW(m->ltsymbol);
@@ -1898,7 +1890,7 @@ showhide(Client *c)
 	if (!c)
 		return;
 	if (ISVISIBLE(c)) {
-		if ((c->tags & SPTAGMASK) && c->isfloating) {
+		if (c->isfloating) {
 			c->x = c->mon->wx + (c->mon->ww / 2 - WIDTH(c) / 2);
 			c->y = c->mon->wy + (c->mon->wh / 2 - HEIGHT(c) / 2);
 		}
@@ -2029,32 +2021,6 @@ togglesticky(const Arg *arg)
 		return;
 	selmon->sel->issticky = !selmon->sel->issticky;
 	arrange(selmon);
-}
-
-void
-togglescratch(const Arg *arg)
-{
-	Client *c;
-	unsigned int found = 0;
-	unsigned int scratchtag = SPTAG(arg->ui);
-	Arg sparg = {.v = scratchpads[arg->ui].cmd};
-
-	for (c = selmon->clients; c && !(found = c->tags & scratchtag); c = c->next);
-	if (found) {
-		unsigned int newtagset = selmon->tagset[selmon->seltags] ^ scratchtag;
-		if (newtagset) {
-			selmon->tagset[selmon->seltags] = newtagset;
-			focus(NULL);
-			arrange(selmon);
-		}
-		if (ISVISIBLE(c)) {
-			focus(c);
-			restack(selmon);
-		}
-	} else {
-		selmon->tagset[selmon->seltags] |= scratchtag;
-		spawn(&sparg);
-	}
 }
 
 void
