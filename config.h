@@ -4,8 +4,8 @@
 #include <X11/Xutil.h>
 static const int swallowfloating    = 0;        /* 1 means swallow floating windows by default */
 static const unsigned int gappih    = 20;       /* horiz inner gap between windows */
-static const unsigned int gappiv    = 10;       /* vert inner gap between windows */
-static const unsigned int gappoh    = 10;       /* horiz outer gap between windows and screen edge */
+static const unsigned int gappiv    = 20;       /* vert inner gap between windows */
+static const unsigned int gappoh    = 20;       /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov    = 30;       /* vert outer gap between windows and screen edge */
 static int smartgaps                = 0;        /* 1 means no outer gap when there is only one window */
 
@@ -20,10 +20,17 @@ static char normfgcolor[]           = "#bbbbbb";
 static char selfgcolor[]            = "#eeeeee";
 static char selbordercolor[]        = "#005577";
 static char selbgcolor[]            = "#005577";
+
 static char *colors[][3] = {
     /*               fg           bg           border   */
-    [SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
-    [SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  },
+    [SchemeNorm] = { selfgcolor, normbgcolor, normbordercolor }, // unfocused wins
+    [SchemeSel]  = { selfgcolor, selbgcolor,  selbordercolor },  // the focused win
+
+	[SchemeStatus]  = { normfgcolor, normbgcolor,  "#000000"  }, // Statusbar right {text,background,not used but cannot be empty}
+	[SchemeTagsSel]  = { normfgcolor, selbordercolor,  "#000000"  }, // Tagbar left selected {text,background,not used but cannot be empty}
+	[SchemeTagsNorm]  = { normfgcolor, normbgcolor,  "#000000"  }, // Tagbar left unselected {text,background,not used but cannot be empty}
+	[SchemeInfoSel]  = { normfgcolor, normbgcolor,  "#000000"  }, // infobar middle  selected {text,background,not used but cannot be empty}
+	[SchemeInfoNorm]  = { normfgcolor, normbgcolor,  "#000000"  }, // infobar middle  unselected {text,background,not used but cannot be empty}
 };
 
 /* tagging */
@@ -44,7 +51,7 @@ static const Rule rules[] = {
 /* layout(s) */
 static float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
 static int nmaster     = 1;    /* number of clients in master area */
-static int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
+static int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 
 #define FORCE_VSPLIT 1  /* nrowgrid layout: force two clients to always split vertically */
@@ -80,10 +87,10 @@ static const Layout layouts[] = {
 #define STACKKEYS(MOD,ACTION) \
 	{ MOD,	XK_j,	ACTION##stack,	{.i = INC(+1) } }, \
 	{ MOD,	XK_k,	ACTION##stack,	{.i = INC(-1) } }, \
-	{ MOD,  XK_v,   ACTION##stack,  {.i = 0 } }, \
 	{ MOD,  XK_Right,   ACTION##stack,  {.i = INC(+1) } }, \
 	{ MOD,  XK_Left,    ACTION##stack,  {.i = INC(-1) } }, \
 
+	/* { MOD,  XK_v,   ACTION##stack,  {.i = 0 } }, \ */
 	/* { MOD, XK_grave, ACTION##stack, {.i = PREVSEL } }, \ */
 	/* { MOD, XK_a,     ACTION##stack, {.i = 1 } }, \ */
 	/* { MOD, XK_z,     ACTION##stack, {.i = 2 } }, \ */
@@ -94,7 +101,8 @@ static const Layout layouts[] = {
 
 /* commands */
 /* static char dmenumon[2] = "0"; */ /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[]  = { "/home/duarte/scripts/dmenu_run.sh", NULL };
+static const char *dmenucmd[]  = { "/home/duarte/scripts/dmenu_drun.sh", NULL };
+static const char *dmenushut[]  = { "/home/duarte/scripts/dmenu_shut.sh", NULL };
 static const char *termcmd[]  = { "st", NULL };
 static const char *browsercmd[]  = { "/home/duarte/scripts/firefox.sh", NULL };
 
@@ -132,23 +140,20 @@ static const Key keys[] = {
 
     { 0, XF86XK_AudioLowerVolume, spawn, SHCMD("pamixer --decrease 5; pkill -RTMIN+10 dwmblocks") },
     { 0, XF86XK_AudioRaiseVolume, spawn, SHCMD("pamixer --increase 5; pkill -RTMIN+10 dwmblocks") },
-    { 0, XF86XK_AudioMute, spawn, SHCMD("pamixer --toggle-mute; pkill -RTMIN+10 dwmblocks") },
+    { 0, XF86XK_AudioMute,        spawn, SHCMD("pamixer --toggle-mute; pkill -RTMIN+10 dwmblocks") },
 
     { 0, XF86XK_MonBrightnessUp,   spawn, SHCMD("brightnessctl set +10%; pkill -RTMIN+11 dwmblocks") },
     { 0, XF86XK_MonBrightnessDown, spawn, SHCMD("brightnessctl set 10%-; pkill -RTMIN+11 dwmblocks") },
 
-//  { MODKEY,                       XK_j,          focusstack,     {.i = +1 } },
-//	{ MODKEY,                       XK_k,          focusstack,     {.i = -1 } },
-//	{ MODKEY,                       XK_Left,       focusstack,     {.i = -1 } },
-//	{ MODKEY,                       XK_Right,      focusstack,     {.i = +1 } },
-
 	{ MODKEY,                       XK_i,          incnmaster,     {.i = +1 } },
 	{ MODKEY,                       XK_d,          incnmaster,     {.i = -1 } },
-	{ MODKEY,                       XK_h,          setmfact,       {.f = -0.05} },
-	{ MODKEY,                       XK_l,          setmfact,       {.f = +0.05} },
+	{ MODKEY,                       XK_h,          setmfact,       {.f = -0.02} },
+	{ MODKEY,                       XK_l,          setmfact,       {.f = +0.02} },
 	{ MODKEY,                       XK_Return,     zoom,           {0} },
 	{ MODKEY,                       XK_Tab,        view,           {0} },
 	{ MODKEY,                       XK_q,          killclient,     {0} },
+
+	{ MODKEY|Mod1Mask,              XK_0,      togglegaps,     {0} },
 
 	{ MODKEY|Mod1Mask,              XK_KP_Insert,  setlayout,      {.v = &layouts[0]} },
 	{ MODKEY|Mod1Mask,              XK_KP_End,     setlayout,      {.v = &layouts[1]} },
@@ -161,24 +166,10 @@ static const Key keys[] = {
 
 	{ MODKEY,                       XK_F11,        togglefullscr,  {0} },
 	{ MODKEY,                       XK_p,          spawn,          {.v = dmenucmd } },
+	{ MODKEY|ShiftMask,             XK_q,          spawn,          {.v = dmenushut } },
 	{ MODKEY,                       XK_t,          spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,          spawn,          {.v = browsercmd } },
 	{ MODKEY,                       XK_r,          spawn,          SHCMD("st -e ranger") },
-
-	{ MODKEY,			            XK_h,          setmfact,       {.f = -0.05} },
-	{ MODKEY,			            XK_l,          setmfact,       {.f = +0.05} },
-
-	// apaguei, logo, nao uso ou nao sei para que serve
-	// { MODKEY,			XK_apostrophe, togglescratch,          {.ui = 1} },
-	// /* { MODKEY|ShiftMask,		XK_apostrophe, spawn,                  SHCMD("") }, */
-	// { MODKEY|ShiftMask,		XK_apostrophe, togglesmartgaps,        {0} },
-	// { MODKEY,			XK_Return,     spawn,                  {.v = termcmd } },
-	// { MODKEY|ShiftMask,		XK_Return,     togglescratch,          {.ui = 0} },
-
-	// { MODKEY,			XK_Left,       focusmon,               {.i = -1 } },
-	// { MODKEY|ShiftMask,		XK_Left,       tagmon,                 {.i = -1 } },
-	// { MODKEY,			XK_Right,      focusmon,               {.i = +1 } },
-	// { MODKEY|ShiftMask,		XK_Right,      tagmon,                 {.i = +1 } },
 
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
 	{ MODKEY,                       XK_v,      togglefloating, {0} },
