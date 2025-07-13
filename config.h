@@ -103,6 +103,7 @@ static const Layout layouts[] = {
 /* static char dmenumon[2] = "0"; */ /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[]  = { "/home/duarte/scripts/dmenu_drun.sh", NULL };
 static const char *dmenushut[]  = { "/home/duarte/scripts/dmenu_shut.sh", NULL };
+static const char *dmenubookmarks[]  = { "/home/duarte/scripts/dmenu_bookmarks.sh", NULL };
 static const char *termcmd[]  = { "st", NULL };
 static const char *browsercmd[]  = { "/home/duarte/scripts/firefox.sh", NULL };
 
@@ -167,9 +168,11 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_F11,        togglefullscr,  {0} },
 	{ MODKEY,                       XK_p,          spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_q,          spawn,          {.v = dmenushut } },
+	{ MODKEY,                       XK_a,          spawn,          {.v = dmenubookmarks } },
 	{ MODKEY,                       XK_t,          spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,          spawn,          {.v = browsercmd } },
 	{ MODKEY,                       XK_r,          spawn,          SHCMD("st -e ranger") },
+	{ MODKEY,                       XK_m,          spawn,          SHCMD("st -e ncmpcpp") },
 
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
 	{ MODKEY,                       XK_v,      togglefloating, {0} },
