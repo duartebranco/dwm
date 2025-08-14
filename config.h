@@ -103,7 +103,10 @@ static const Layout layouts[] = {
 /* static char dmenumon[2] = "0"; */ /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[]  = { "/home/duarte/scripts/dmenu_drun.sh", NULL };
 static const char *dmenushut[]  = { "/home/duarte/scripts/dmenu_shut.sh", NULL };
+static const char *dmenurealshut[]  = { "/home/duarte/scripts/dmenu_realshut.sh", NULL };
 static const char *dmenubookmarks[]  = { "/home/duarte/scripts/dmenu_bookmarks.sh", NULL };
+static const char *vms[]  = { "/home/duarte/scripts/dmenu_vm.sh", NULL };
+static const char *wallpaper[]  = { "/home/duarte/scripts/wallpaper.sh", NULL };
 static const char *termcmd[]  = { "st", NULL };
 static const char *browsercmd[]  = { "/home/duarte/scripts/firefox.sh", NULL };
 
@@ -146,7 +149,9 @@ static const Key keys[] = {
     { 0, XF86XK_MonBrightnessUp,   spawn, SHCMD("brightnessctl set +10%; pkill -RTMIN+11 dwmblocks") },
     { 0, XF86XK_MonBrightnessDown, spawn, SHCMD("brightnessctl set 10%-; pkill -RTMIN+11 dwmblocks") },
 
-	{ MODKEY,                       XK_i,          incnmaster,     {.i = +1 } },
+    { 0, XF86XK_PowerOff, spawn, {.v = dmenurealshut } },
+
+    { MODKEY,                       XK_i,          incnmaster,     {.i = +1 } },
 	{ MODKEY,                       XK_d,          incnmaster,     {.i = -1 } },
 	{ MODKEY,                       XK_h,          setmfact,       {.f = -0.02} },
 	{ MODKEY,                       XK_l,          setmfact,       {.f = +0.02} },
@@ -168,6 +173,9 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_F11,        togglefullscr,  {0} },
 	{ MODKEY,                       XK_p,          spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_q,          spawn,          {.v = dmenushut } },
+	{ MODKEY|ControlMask|ShiftMask, XK_q,          quit,           {1} },
+	{ MODKEY,                       XK_w,          spawn,          {.v = wallpaper } },
+	{ MODKEY|Mod1Mask,              XK_m,          spawn,          {.v = vms } },
 	{ MODKEY,                       XK_a,          spawn,          {.v = dmenubookmarks } },
 	{ MODKEY,                       XK_t,          spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,          spawn,          {.v = browsercmd } },
