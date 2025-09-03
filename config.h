@@ -101,10 +101,11 @@ static const Layout layouts[] = {
 
 /* commands */
 /* static char dmenumon[2] = "0"; */ /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[]  = { "/home/duarte/scripts/dmenu_drun.sh", NULL };
-static const char *dmenushut[]  = { "/home/duarte/scripts/dmenu_shut.sh", NULL };
-static const char *dmenurealshut[]  = { "/home/duarte/scripts/dmenu_realshut.sh", NULL };
-static const char *dmenubookmarks[]  = { "/home/duarte/scripts/dmenu_bookmarks.sh", NULL };
+static const char *dmenucmd[]  = { "/home/duarte/scripts/dmenu/dmenu_drun.sh", NULL };
+static const char *dmenushut[]  = { "/home/duarte/scripts/dmenu/dmenu_shut.sh", NULL };
+static const char *dmenurealshut[]  = { "/home/duarte/scripts/dmenu/dmenu_realshut.sh", NULL };
+static const char *dmenubookmarks[]  = { "/home/duarte/scripts/dmenu/dmenu_bookmarks.sh", NULL };
+
 static const char *vms[]  = { "/home/duarte/scripts/dmenu_vm.sh", NULL };
 static const char *wallpaper[]  = { "/home/duarte/scripts/wallpaper.sh", NULL };
 static const char *termcmd[]  = { "st", NULL };
@@ -140,7 +141,14 @@ static const Key keys[] = {
 	TAGKEYS(                        XK_2,          1)
 	TAGKEYS(                        XK_3,          2)
 	TAGKEYS(                        XK_4,          3)
-	TAGKEYS(                       	XK_5,          4)
+	TAGKEYS(                        XK_5,          4)
+
+    { MODKEY,                       XK_F2, spawn, SHCMD("pamixer --decrease 5; pkill -RTMIN+10 dwmblocks") },
+    { MODKEY,                       XK_F3, spawn, SHCMD("pamixer --increase 5; pkill -RTMIN+10 dwmblocks") },
+    { MODKEY,                       XK_F1, spawn, SHCMD("pamixer --toggle-mute; pkill -RTMIN+10 dwmblocks") },
+
+    { MODKEY, XK_F6, spawn, SHCMD("brightnessctl set +10%; pkill -RTMIN+11 dwmblocks") },
+    { MODKEY, XK_F5, spawn, SHCMD("brightnessctl set 10%-; pkill -RTMIN+11 dwmblocks") },
 
     { 0, XF86XK_AudioLowerVolume, spawn, SHCMD("pamixer --decrease 5; pkill -RTMIN+10 dwmblocks") },
     { 0, XF86XK_AudioRaiseVolume, spawn, SHCMD("pamixer --increase 5; pkill -RTMIN+10 dwmblocks") },
