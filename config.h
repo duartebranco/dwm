@@ -105,8 +105,8 @@ static const char *dmenucmd[]  = { "/home/duarte/scripts/dmenu/dmenu_drun.sh", N
 static const char *dmenushut[]  = { "/home/duarte/scripts/dmenu/dmenu_shut.sh", NULL };
 static const char *dmenurealshut[]  = { "/home/duarte/scripts/dmenu/dmenu_realshut.sh", NULL };
 static const char *dmenubookmarks[]  = { "/home/duarte/scripts/dmenu/dmenu_bookmarks.sh", NULL };
+static const char *vms[]  = { "/home/duarte/scripts/dmenu/dmenu_vm.sh", NULL };
 
-static const char *vms[]  = { "/home/duarte/scripts/dmenu_vm.sh", NULL };
 static const char *wallpaper[]  = { "/home/duarte/scripts/wallpaper.sh", NULL };
 static const char *termcmd[]  = { "st", NULL };
 static const char *browsercmd[]  = { "/home/duarte/scripts/firefox.sh", NULL };
