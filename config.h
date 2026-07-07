@@ -110,6 +110,8 @@ static const char *vms[]  = { "/home/duarte/scripts/dmenu/dmenu_vm.sh", NULL };
 static const char *record[]  = { "/home/duarte/scripts/record.sh", NULL };
 static const char *wallpaper[]  = { "/home/duarte/scripts/wallpaper.sh", NULL };
 static const char *termcmd[]  = { "st", NULL };
+static const char scratchpadname[] = "scratchpad";
+static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
 
 /*
  * Xresources preferences to load at startup
@@ -188,6 +190,7 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_Left,   tagtoprev,      {0} },
 
 	{ MODKEY,                       XK_F11,        togglefullscr,  {0} },
+	{ MODKEY,                       XK_n,          togglescratch,  {.v = scratchpadcmd } },
 	{ MODKEY,                       XK_p,          spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_s,          spawn,          {.v = dmenuscrpt } },
 	{ MODKEY|ShiftMask,             XK_q,          spawn,          {.v = dmenushut } },
