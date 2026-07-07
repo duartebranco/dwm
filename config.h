@@ -191,6 +191,7 @@ static const Key keys[] = {
 
 	{ MODKEY,                       XK_F11,        togglefullscr,  {0} },
 	{ MODKEY,                       XK_n,          togglescratch,  {.v = scratchpadcmd } },
+	{ MODKEY|ShiftMask,             XK_n,          sendtoscratch,  {0} },
 	{ MODKEY,                       XK_p,          spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_s,          spawn,          {.v = dmenuscrpt } },
 	{ MODKEY|ShiftMask,             XK_q,          spawn,          {.v = dmenushut } },
