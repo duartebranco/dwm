@@ -87,8 +87,8 @@ static const Layout layouts[] = {
 #define STACKKEYS(MOD,ACTION) \
 	{ MOD,	XK_j,	ACTION##stack,	{.i = INC(+1) } }, \
 	{ MOD,	XK_k,	ACTION##stack,	{.i = INC(-1) } }, \
-	{ MOD,  XK_Right,   ACTION##stack,  {.i = INC(+1) } }, \
-	{ MOD,  XK_Left,    ACTION##stack,  {.i = INC(-1) } }, \
+/*	{ MOD,  XK_Right,   ACTION##stack,  {.i = INC(+1) } }, \ */
+/*	{ MOD,  XK_Left,    ACTION##stack,  {.i = INC(-1) } }, \ */
 
 	/* { MOD,  XK_v,   ACTION##stack,  {.i = 0 } }, \ */
 	/* { MOD, XK_grave, ACTION##stack, {.i = PREVSEL } }, \ */
@@ -105,7 +105,6 @@ static const char *dmenucmd[]  = { "/home/duarte/scripts/dmenu/dmenu_drun.sh", N
 static const char *dmenuscrpt[]  = { "/home/duarte/scripts/dmenu/dmenu_scripts.sh", NULL };
 static const char *dmenushut[]  = { "/home/duarte/scripts/dmenu/dmenu_shut.sh", NULL };
 static const char *dmenurealshut[]  = { "/home/duarte/scripts/dmenu/dmenu_realshut.sh", NULL };
-static const char *dmenubookmarks[]  = { "/home/duarte/scripts/dmenu/dmenu_bookmarks.sh", NULL };
 static const char *vms[]  = { "/home/duarte/scripts/dmenu/dmenu_vm.sh", NULL };
 
 static const char *record[]  = { "/home/duarte/scripts/record.sh", NULL };
@@ -179,6 +178,11 @@ static const Key keys[] = {
 	{ MODKEY|Mod1Mask,              XK_KP_Right,   setlayout,      {.v = &layouts[6]} },
 	{ MODKEY|Mod1Mask,              XK_KP_Home,    setlayout,      {.v = &layouts[7]} },
 
+	{ MODKEY,                       XK_Right,  viewnext,       {0} },
+	{ MODKEY,                       XK_Left,   viewprev,       {0} },
+	{ MODKEY|ShiftMask,             XK_Right,  tagtonext,      {0} },
+	{ MODKEY|ShiftMask,             XK_Left,   tagtoprev,      {0} },
+
 	{ MODKEY,                       XK_F11,        togglefullscr,  {0} },
 	{ MODKEY,                       XK_p,          spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_s,          spawn,          {.v = dmenuscrpt } },
@@ -186,7 +190,6 @@ static const Key keys[] = {
 	{ MODKEY|ControlMask|ShiftMask, XK_q,          quit,           {1} },
 	{ MODKEY,                       XK_w,          spawn,          {.v = wallpaper } },
 	{ MODKEY|Mod1Mask,              XK_m,          spawn,          {.v = vms } },
-	{ MODKEY,                       XK_a,          spawn,          {.v = dmenubookmarks } },
 	{ MODKEY,                       XK_t,          spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,          spawn,          SHCMD("st -e firefox") },
 	{ MODKEY,                       XK_f,          spawn,          {.v = record } },
@@ -199,8 +202,8 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
 
-	{ 0,                            XK_Print,  spawn,          SHCMD("scrot -s ~/img/Screenshots/screenshot_%Y%m%d_%H%M%S.png") },
-    { Mod1Mask,                     XK_Print,  spawn,          SHCMD("scrot ~/img/Screenshots/screenshot_%Y%m%d_%H%M%S.png") },
+	{ 0,                            XK_Print,  spawn,          SHCMD("scrot -s ~/img/Screenshots/screenshot_%Y%m%d_%H%M%S.png -e 'xclip -selection clipboard -target image/png -i $f'") },
+    { Mod1Mask,                     XK_Print,  spawn,          SHCMD("scrot ~/img/Screenshots/screenshot_%Y%m%d_%H%M%S.png -e 'xclip -selection clipboard -target image/png -i $f'") },
 };
 
 /* button definitions */
