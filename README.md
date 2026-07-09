@@ -6,14 +6,18 @@ You probably should make your own builds, since it's in the "suckless" mindset t
 
 ## Patches/Changes Included
 
-
-- **Vanitygaps**: Adjustable gaps between windows for a modern tiling look.
-- **Multiple layouts**: Includes tile, bstack, monocle, spiral, centered master, grid, nrowgrid, and floating.
-- **Xresources support**: Colors and some settings can be loaded at startup from Xresources.
-- **Simple tagging**: Uses 5 default tags (workspaces) for window organization.
-- **Streamlined keybindings**: Focus on essential tiling, launching terminal, browser, and dmenu.
-- **Status bar**: Minimal setup, compatible with dwmblocks (but less interactive than Luke's).
-- **No scratchpads, swallow, or sticky windows**: Only core tiling window management features.
+- **Vanitygaps** - per-side gap control with toggle (`Mod+Alt+0`), individual inner/outer/horizontal/vertical gap adjustments.
+- **Scratchpad** - a persistent floating terminal on a hidden tag (`Mod+n` to toggle, `Mod+Shift+n` to send window to scratchpad).
+- **Adjacent tag navigation** - `Mod+Left/Right` cycles through occupied tags; `Mod+Shift+Left/Right` moves the focused window to the adjacent tag.
+- **Hide vacant tags** - only tags with windows or the current tag are drawn in the bar, saving space.
+- **Color schemes** - extended status bar colors: `SchemeStatus`, `SchemeTagsSel/Norm`, `SchemeInfoSel/Norm` for granular bar styling.
+- **9 tags** - expanded from the default 5.
+- **Custom `config.mk`** - install prefix set to `$(HOME)/.local` instead of `/usr/local`.
+- **Disable resize hints** - `resizehints = 0` for more predictable tiling.
+- **Shorter setmfact steps** - `0.02` instead of `0.05`.
+- **Custom scripts** - bindings for dmenu-drun, dmenu-scripts, power menu, VM selector, recording script, wallpaper switcher, music (ncmpcpp), file manager (ranger), and browser.
+- **Screenshot to clipboard** - `Print` captures selection, `Alt+Print` captures fullscreen, both copy to clipboard via `xclip`.
+- **Hardware keybindings** - volume/brightness via `Mod+F1-F6` and `XF86XK_*` keys, `PowerOff` key launches shutdown menu.
 
 *(See the source and config.h for details.)*
 ## Compilation
